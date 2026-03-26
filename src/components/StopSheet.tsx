@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 import { MapPin, Heart, Clock, X } from "lucide-react";
 import clsx from "clsx";
-import { getArrivalsForStop, type BusStop } from "@/data/mockBusData";
+import { type BusStop } from "@/data/tfiApi";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useTfiRealtime } from "@/hooks/useTfiRealtime";
 
 interface Props {
   stop: BusStop | null;
@@ -18,6 +19,7 @@ function operatorColor(op: string) {
 
 export default function StopSheet({ stop, open, onClose }: Props) {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+  const { getArrivalsForStop } = useTfiRealtime();
   const ref = useRef<HTMLDivElement>(null);
 
   // Close on backdrop click
@@ -39,6 +41,7 @@ export default function StopSheet({ stop, open, onClose }: Props) {
 
   if (!stop) return null;
 
+  console.log(`[StopSheet] Opening stop:`, stop);
   const arrivals = getArrivalsForStop(stop.id);
   const faved = isFavorite(stop.id);
 
@@ -116,7 +119,7 @@ export default function StopSheet({ stop, open, onClose }: Props) {
                 <span className="text-white text-xs font-bold">{a.routeNumber}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{a.destination}</p>
+                <p className="text-sm font-medium text-gray-900 truncate">{a.fullTrip}</p>
                 <p className="text-[11px] text-gray-500">{a.operator} · {a.scheduled}</p>
               </div>
               <div className="text-right shrink-0">
@@ -129,6 +132,10 @@ export default function StopSheet({ stop, open, onClose }: Props) {
               )} />
             </div>
           ))}
+
+          {arrivals.length === 0 && (
+            <p className="text-sm text-gray-400 text-center py-4">No live arrivals for this stop</p>
+          )}
         </div>
       </div>
     </>

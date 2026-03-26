@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Search, Bus, MapPin } from "lucide-react";
 import clsx from "clsx";
-import { mockRoutes, mockStops, type Operator } from "@/data/mockBusData";
+import { type Operator } from "@/data/tfiApi";
+import { useTfiRealtime } from "@/hooks/useTfiRealtime";
 
 type Filter = "all" | Operator;
 
@@ -24,24 +25,30 @@ function operatorDotColor(op: Operator) {
   return "bg-tfi-green";
 }
 
-export default function SearchScreen() {
+interface SearchScreenProps {
+  onRouteSelect: (routeNumber: string) => void;
+}
+
+export default function SearchScreen({ onRouteSelect }: SearchScreenProps) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+  const { routes: liveRoutes, stops: liveStops, isLoading } = useTfiRealtime();
 
   const q = query.toLowerCase();
 
-  const routes = mockRoutes.filter((r) => {
+  const routes = liveRoutes.filter((r) => {
     const matchQ = !q || r.number.toLowerCase().includes(q) || r.name.toLowerCase().includes(q);
     const matchF = filter === "all" || r.operator === filter;
     return matchQ && matchF;
   });
 
   const stops = query
-    ? mockStops.filter(
-        (s) =>
+    ? liveStops
+        .filter((s) =>
           s.name.toLowerCase().includes(q) ||
-          s.routes.some((r) => r.toLowerCase().includes(q))
-      )
+          s.routes.some((route) => route.toLowerCase().includes(q))
+        )
+        .slice(0, 80)
     : [];
 
   return (
@@ -90,10 +97,14 @@ export default function SearchScreen() {
             <Bus size={11} /> Routes ({routes.length})
           </p>
           <div className="space-y-2">
+            {isLoading && (
+              <p className="text-sm text-gray-400 text-center py-4">Loading live routes...</p>
+            )}
             {routes.map((r) => (
               <div
                 key={r.id}
-                className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100"
+                className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 cursor-pointer hover:border-tfi-green/40"
+                onClick={() => onRouteSelect(r.number)}
               >
                 <div className="h-11 w-11 rounded-xl bg-tfi-green flex items-center justify-center shrink-0">
                   <span className="text-white text-xs font-bold">{r.number}</span>
@@ -111,7 +122,7 @@ export default function SearchScreen() {
               </div>
             ))}
             {routes.length === 0 && (
-              <p className="text-sm text-gray-400 text-center py-6">No routes found</p>
+              <p className="text-sm text-gray-400 text-center py-6">No live routes found</p>
             )}
           </div>
         </div>

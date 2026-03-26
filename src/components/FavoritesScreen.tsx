@@ -1,10 +1,11 @@
 import { Heart, MapPin, Bus, Trash2 } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
-import { getArrivalsForStop } from "@/data/mockBusData";
 import clsx from "clsx";
+import { useTfiRealtime } from "@/hooks/useTfiRealtime";
 
 export default function FavoritesScreen() {
   const { favorites, removeFavorite } = useFavorites();
+  const { arrivals } = useTfiRealtime();
 
   return (
     <div className="flex flex-col h-full bg-gray-50">
@@ -28,8 +29,9 @@ export default function FavoritesScreen() {
         ) : (
           <div className="space-y-3">
             {favorites.map((fav) => {
-              const arrivals = fav.type === "stop" ? getArrivalsForStop(fav.id) : [];
-              const next = arrivals[0];
+              const next = fav.type === "route"
+                ? arrivals.find((a) => a.routeNumber === fav.id || a.routeNumber === fav.name)
+                : undefined;
 
               return (
                 <div key={fav.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
