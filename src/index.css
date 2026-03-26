@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Leaflet overrides */
+@import "leaflet/dist/leaflet.css";
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Bus marker */
+.bus-pin {
+  background: #1a7a4a;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: "Inter", sans-serif;
+  border-radius: 6px;
+  padding: 3px 6px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  border: 1.5px solid rgba(255,255,255,0.4);
+}
+
+.bus-pin.go-ahead {
+  background: #0ea5e9;
+}
+
+.bus-pin.bus-eireann {
+  background: #f97316;
+}
+
+/* Stop marker */
+.stop-pin {
+  width: 10px;
+  height: 10px;
+  background: white;
+  border: 2.5px solid #1a7a4a;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+/* Remove default leaflet outline */
+.leaflet-container:focus {
+  outline: none;
+}
+
+/* Custom scrollbar */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Safe area padding */
+.pt-safe { padding-top: calc(var(--safe-top) + 0.75rem); }
+.pb-safe { padding-bottom: calc(var(--safe-bottom) + 4rem); }
