@@ -108,8 +108,17 @@ function VisibleStopsController({
   });
 
   function updateVisibleStops() {
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const zoom = map.getZoom();
+    const minZoom = isMobile ? 13 : 12;
+    if (zoom < minZoom) {
+      onVisibleStopsChange([]);
+      return;
+    }
+
+    const maxVisible = isMobile ? 140 : 300;
     const bounds = map.getBounds();
-    const inView = stops.filter((stop) => bounds.contains([stop.lat, stop.lng])).slice(0, 450);
+    const inView = stops.filter((stop) => bounds.contains([stop.lat, stop.lng])).slice(0, maxVisible);
     onVisibleStopsChange(inView);
   }
 
@@ -147,7 +156,7 @@ export default function BusMap({
     <div className="relative h-full w-full">
       {/* Floating header */}
       <div className="absolute top-0 left-0 right-0 z-[1000] px-4 pt-safe">
-        <div className="mt-1 bg-white/95 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 px-4 py-3 flex items-center gap-3">
+        <div className="mt-1 bg-white/95 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 px-3 py-2.5 md:px-4 md:py-3 flex items-center gap-2.5 md:gap-3">
           <div className="h-9 w-9 rounded-xl bg-tfi-green flex items-center justify-center shrink-0">
             <Bus size={16} className="text-white" />
           </div>

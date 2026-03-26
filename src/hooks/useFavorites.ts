@@ -8,6 +8,7 @@ export interface FavoriteItem {
 }
 
 const KEY = "tfi-favorites";
+const SYNC_EVENT = "tfi-favorites-updated";
 
 function sameFavorite(a: FavoriteItem, b: { id: string; type?: FavoriteItem["type"] }): boolean {
   return a.id === b.id && (b.type ? a.type === b.type : true);
@@ -25,7 +26,26 @@ export function useFavorites() {
 
   useEffect(() => {
     localStorage.setItem(KEY, JSON.stringify(favorites));
+    window.dispatchEvent(new CustomEvent(SYNC_EVENT));
   }, [favorites]);
+
+  useEffect(() => {
+    const syncFromStorage = () => {
+      try {
+        const raw = localStorage.getItem(KEY);
+        setFavorites(raw ? (JSON.parse(raw) as FavoriteItem[]) : []);
+      } catch {
+        setFavorites([]);
+      }
+    };
+
+    window.addEventListener("storage", syncFromStorage);
+    window.addEventListener(SYNC_EVENT, syncFromStorage);
+    return () => {
+      window.removeEventListener("storage", syncFromStorage);
+      window.removeEventListener(SYNC_EVENT, syncFromStorage);
+    };
+  }, []);
 
   const addFavorite = useCallback((item: FavoriteItem) => {
     setFavorites((prev) => (prev.some((f) => sameFavorite(f, item)) ? prev : [...prev, item]));

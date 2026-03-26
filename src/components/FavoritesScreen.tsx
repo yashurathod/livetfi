@@ -34,7 +34,7 @@ export default function FavoritesScreen() {
                 : undefined;
 
               return (
-                <div key={fav.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                <div key={`${fav.type}:${fav.id}`} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
                   {/* Top row */}
                   <div className="flex items-center gap-3">
                     <div className={clsx(
