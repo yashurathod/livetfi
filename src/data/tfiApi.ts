@@ -428,17 +428,6 @@ export async function fetchTfiFeed(): Promise<ParsedFeed> {
     a.number.localeCompare(b.number, undefined, { numeric: true })
   );
 
-  // Debug log
-  console.log(
-    `[TFI Parser] buses=${buses.length}, routes=${routes.length}, arrivals=${arrivals.length}, stops=${stops.length}, allStops=${allStops.length}`
-  );
-  if (arrivals.length > 0) {
-    console.log(`[TFI Parser] Sample arrival:`, arrivals[0]);
-    // Show unique stop IDs in arrivals
-    const uniqueStopIds = new Set(arrivals.map(a => a.stopId));
-    console.log(`[TFI Parser] Sample arrival stop IDs:`, Array.from(uniqueStopIds).slice(0, 10));
-  }
-
   return {
     buses,
     routes,

@@ -36,10 +36,7 @@ export function useTfiRealtime() {
   const getArrivalsForStop = (stopId: string): Arrival[] => {
     // Direct lookup
     const direct = arrivalsByStop.get(stopId);
-    if (direct && direct.length > 0) {
-      console.log(`[StopLookup] Direct match for ${stopId}:`, direct.length, "arrivals");
-      return direct;
-    }
+    if (direct && direct.length > 0) return direct;
     
     // Fallback: try all arrivals and filter by stopId (in case of ID format mismatches)
     const allArrivals = query.data?.arrivals ?? [];
@@ -48,11 +45,6 @@ export function useTfiRealtime() {
       a.stopId.includes(stopId) || 
       stopId.includes(a.stopId)
     );
-    
-    console.log(
-      `[StopLookup] Fallback for ${stopId}: checked ${allArrivals.length} arrivals, found ${matching.length} matches`
-    );
-    if (matching.length > 0) console.log(`[StopLookup] Sample match:`, matching[0]);
     
     if (matching.length > 0) {
       matching.sort((a, b) => a.minutesAway - b.minutesAway);

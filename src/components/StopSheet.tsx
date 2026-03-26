@@ -40,14 +40,12 @@ export default function StopSheet({ stop, open, onClose }: Props) {
   }, [onClose]);
 
   if (!stop) return null;
-
-  console.log(`[StopSheet] Opening stop:`, stop);
   const arrivals = getArrivalsForStop(stop.id);
-  const faved = isFavorite(stop.id);
+  const faved = isFavorite(stop.id, "stop");
 
   const toggleFav = () => {
     if (faved) {
-      removeFavorite(stop.id);
+      removeFavorite(stop.id, "stop");
     } else {
       addFavorite({ id: stop.id, type: "stop", name: stop.name, subtitle: `${stop.routes.length} routes` });
     }

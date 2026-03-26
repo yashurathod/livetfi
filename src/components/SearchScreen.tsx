@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Search, Bus, MapPin } from "lucide-react";
+import { Search, Bus, MapPin, Heart } from "lucide-react";
 import clsx from "clsx";
 import { type Operator } from "@/data/tfiApi";
 import { useTfiRealtime } from "@/hooks/useTfiRealtime";
+import { useFavorites } from "@/hooks/useFavorites";
 
 type Filter = "all" | Operator;
 
@@ -33,6 +34,7 @@ export default function SearchScreen({ onRouteSelect }: SearchScreenProps) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
   const { routes: liveRoutes, stops: liveStops, isLoading } = useTfiRealtime();
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
 
   const q = query.toLowerCase();
 
@@ -118,6 +120,28 @@ export default function SearchScreen({ onRouteSelect }: SearchScreenProps) {
                     {r.operator}
                   </span>
                 </div>
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (isFavorite(r.number, "route")) {
+                      removeFavorite(r.number, "route");
+                      return;
+                    }
+                    addFavorite({
+                      id: r.number,
+                      type: "route",
+                      name: `Route ${r.number}`,
+                      subtitle: r.name,
+                    });
+                  }}
+                  className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+                  aria-label={`Save route ${r.number}`}
+                >
+                  <Heart
+                    size={16}
+                    className={isFavorite(r.number, "route") ? "fill-red-500 text-red-500" : "text-gray-400"}
+                  />
+                </button>
                 <div className={clsx("h-2 w-2 rounded-full shrink-0", operatorDotColor(r.operator))} />
               </div>
             ))}
@@ -146,6 +170,27 @@ export default function SearchScreen({ onRouteSelect }: SearchScreenProps) {
                     <p className="text-sm font-semibold text-gray-900 truncate">{s.name}</p>
                     <p className="text-[11px] text-gray-500 mt-0.5">Routes: {s.routes.join(", ")}</p>
                   </div>
+                  <button
+                    onClick={() => {
+                      if (isFavorite(s.id, "stop")) {
+                        removeFavorite(s.id, "stop");
+                        return;
+                      }
+                      addFavorite({
+                        id: s.id,
+                        type: "stop",
+                        name: s.name,
+                        subtitle: `${s.routes.length} routes`,
+                      });
+                    }}
+                    className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+                    aria-label={`Save stop ${s.name}`}
+                  >
+                    <Heart
+                      size={16}
+                      className={isFavorite(s.id, "stop") ? "fill-red-500 text-red-500" : "text-gray-400"}
+                    />
+                  </button>
                 </div>
               ))}
               {stops.length === 0 && (

@@ -15,7 +15,7 @@ export default function Index() {
   };
 
   return (
-    <div className="h-full w-full overflow-hidden bg-gray-50 flex flex-col">
+    <div className="app-shell overflow-hidden bg-gray-50 flex flex-col">
       <div className="flex-1 overflow-hidden relative">
         <div className={activeTab === "map" ? "absolute inset-0" : "absolute inset-0 opacity-0 pointer-events-none"}>
           <BusMap active={activeTab === "map"} focusRoute={focusedRoute} />

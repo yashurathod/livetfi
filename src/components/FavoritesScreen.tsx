@@ -23,7 +23,7 @@ export default function FavoritesScreen() {
             </div>
             <p className="text-sm font-semibold text-gray-700">Nothing saved yet</p>
             <p className="text-xs text-gray-400 mt-1 max-w-52 leading-relaxed">
-              Tap the heart on any stop on the map to save it here.
+              Tap hearts on map stop details, route cards, or searched stops to save items here.
             </p>
           </div>
         ) : (
@@ -51,7 +51,7 @@ export default function FavoritesScreen() {
                       <p className="text-[11px] text-gray-500">{fav.subtitle}</p>
                     </div>
                     <button
-                      onClick={() => removeFavorite(fav.id)}
+                      onClick={() => removeFavorite(fav.id, fav.type)}
                       className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-red-50 text-gray-400 hover:text-red-400 transition-colors"
                       aria-label="Remove"
                     >
