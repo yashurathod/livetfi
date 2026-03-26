@@ -17,7 +17,7 @@ interface Props {
 
 export default function BottomNav({ activeTab, onTabChange }: Props) {
   return (
-    <nav className="bg-white border-t border-gray-100 pb-safe shadow-[0_-1px_12px_rgba(0,0,0,0.06)]">
+    <nav className="bg-white border-t border-gray-100 pb-safe-nav shadow-[0_-1px_12px_rgba(0,0,0,0.06)]">
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
         {TABS.map(({ id, label, Icon }) => {
           const active = activeTab === id;
