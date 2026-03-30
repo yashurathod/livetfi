@@ -1,12 +1,11 @@
-import { Map, Search, Heart, Settings } from "lucide-react";
+import { Map, Search, Settings } from "lucide-react";
 import clsx from "clsx";
 
-export type TabId = "map" | "search" | "favorites" | "settings";
+export type TabId = "map" | "search" | "settings";
 
 const TABS: { id: TabId; label: string; Icon: React.ElementType }[] = [
   { id: "map",       label: "Map",       Icon: Map },
   { id: "search",    label: "Search",    Icon: Search },
-  { id: "favorites", label: "Saved",     Icon: Heart },
   { id: "settings",  label: "Settings",  Icon: Settings },
 ];
 

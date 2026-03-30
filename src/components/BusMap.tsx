@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import { type BusPosition, type BusStop } from "../data/tfiApi";
-import { LocateFixed, Bus } from "lucide-react";
+import { LocateFixed, Bus, X } from "lucide-react";
 import { useTfiRealtime } from "../hooks/useTfiRealtime";
 import StopSheet from "./StopSheet";
 
@@ -132,9 +132,13 @@ function VisibleStopsController({
 export default function BusMap({
   active,
   focusRoute,
+  filteredRoute,
+  onClearFilter,
 }: {
   active: boolean;
   focusRoute: { routeNumber: string; nonce: number } | null;
+  filteredRoute: string | null;
+  onClearFilter: () => void;
 }) {
   const { buses, stops, allStops, isLoading, isFetching, isError } = useTfiRealtime();
   const [selectedStop, setSelectedStop] = useState<BusStop | null>(null);
@@ -152,6 +156,12 @@ export default function BusMap({
     return Array.from(byId.values());
   }, [allStops, stops]);
 
+  // Filter buses based on filteredRoute
+  const displayedBuses = useMemo(() => {
+    if (!filteredRoute) return buses;
+    return buses.filter((bus) => bus.routeNumber === filteredRoute);
+  }, [buses, filteredRoute]);
+
   return (
     <div className="relative h-full w-full">
       {/* Floating header */}
@@ -161,15 +171,33 @@ export default function BusMap({
             <Bus size={16} className="text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 leading-tight">TFI Live Tracker</p>
-            <p className="text-[11px] text-gray-500">{buses.length} buses active · {visibleStops.length} stops in view</p>
+            <p className="text-sm font-semibold text-gray-900 leading-tight">
+              {filteredRoute ? `Route ${filteredRoute}` : "TFI Live Tracker"}
+            </p>
+            <p className="text-[11px] text-gray-500">
+              {filteredRoute 
+                ? `${displayedBuses.length} buses · ${visibleStops.length} stops in view`
+                : `${buses.length} buses active · ${visibleStops.length} stops in view`
+              }
+            </p>
           </div>
-          <div className="flex items-center gap-1.5 bg-emerald-50 rounded-full px-2.5 py-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-tfi-green-light animate-pulse-dot" />
-            <span className="text-[10px] font-semibold text-tfi-green">
-              {isLoading ? "SYNC" : isFetching ? "LIVE*" : "LIVE"}
-            </span>
-          </div>
+          {filteredRoute ? (
+            <button
+              onClick={onClearFilter}
+              className="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 rounded-full px-3 py-1.5 transition-colors"
+              aria-label="Show all buses"
+            >
+              <span className="text-[11px] font-semibold text-gray-600">Show All</span>
+              <X size={14} className="text-gray-500" />
+            </button>
+          ) : (
+            <div className="flex items-center gap-1.5 bg-emerald-50 rounded-full px-2.5 py-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-tfi-green-light animate-pulse-dot" />
+              <span className="text-[10px] font-semibold text-tfi-green">
+                {isLoading ? "SYNC" : isFetching ? "LIVE*" : "LIVE"}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -189,7 +217,7 @@ export default function BusMap({
           attribution='&copy; OSM &copy; CARTO'
         />
 
-        {buses.map((bus: BusPosition) => (
+        {displayedBuses.map((bus: BusPosition) => (
           <Marker key={bus.id} position={[bus.lat, bus.lng]} icon={busIcon(bus)}>
             <Popup className="tfi-popup">
               <div className="p-1 min-w-[140px]">
